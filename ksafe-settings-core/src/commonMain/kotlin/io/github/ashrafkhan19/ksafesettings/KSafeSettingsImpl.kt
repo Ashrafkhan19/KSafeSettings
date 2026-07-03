@@ -23,7 +23,7 @@ import kotlin.reflect.KProperty
  */
 internal class KSafeSettingsImpl(
     override val ksafe: KSafe,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
 ) : KSafeSettings {
 
     // ── Key registry (for contains / remove / clear tracking) ─────────────

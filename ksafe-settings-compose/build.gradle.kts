@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.vanniktechPublish)
+    signing
 }
 
 group = "io.github.ashrafkhan19"
@@ -66,7 +67,6 @@ kotlin {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
 
     coordinates(
         groupId = "io.github.ashrafkhan19",
@@ -100,5 +100,15 @@ mavenPublishing {
             connection = "scm:git:git://github.com/Ashrafkhan19/KSafeSettings.git"
             developerConnection = "scm:git:ssh://git@github.com/Ashrafkhan19/KSafeSettings.git"
         }
+    }
+}
+
+signing {
+    val keyId = providers.gradleProperty("signingInMemoryKeyId").orNull
+    val key = providers.gradleProperty("signingInMemoryKey").orNull
+    val password = providers.gradleProperty("signingInMemoryKeyPassword").orNull
+    if (key != null) {
+        useInMemoryPgpKeys(keyId, key, password)
+        sign(publishing.publications)
     }
 }

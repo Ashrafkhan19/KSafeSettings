@@ -6,6 +6,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
 /**
+ * Platform-specific bridge that constructs a default [KSafe] for the current
+ * non-Android target (iOS Keychain, JVM/Desktop file, WASM/JS localStorage).
+ *
+ * This is an internal implementation detail — consumers should use
+ * [KSafeSettings] instead.
+ */
+internal expect fun defaultPlatformKSafe(): KSafe
+
+/**
  * Creates a [KSafeSettings] instance for **iOS, JVM/Desktop, and Web** targets.
  *
  * [KSafe] is initialised internally — no import or configuration of the underlying
@@ -25,7 +34,7 @@ import kotlinx.coroutines.SupervisorJob
  * ```
  */
 fun KSafeSettings(): KSafeSettings =
-    KSafeSettingsImpl(KSafe())
+    KSafeSettingsImpl(defaultPlatformKSafe())
 
 /**
  * Creates a [KSafeSettings] instance for **iOS, JVM/Desktop, and Web** targets
@@ -34,4 +43,5 @@ fun KSafeSettings(): KSafeSettings =
  * Prefer the no-arg overload or [KSafeSettingsProvider] for typical use.
  */
 fun KSafeSettings(scope: CoroutineScope): KSafeSettings =
-    KSafeSettingsImpl(KSafe(), scope)
+    KSafeSettingsImpl(defaultPlatformKSafe(), scope)
+

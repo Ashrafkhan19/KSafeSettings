@@ -180,5 +180,5 @@ interface KSafeSettings {
  * @param scope  Optional [CoroutineScope] for backing [KSafeSettings.flow] StateFlows.
  *               Defaults to an internal `IO` scope if not provided.
  */
-fun KSafeSettings(ksafe: KSafe, scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())): KSafeSettings =
+fun KSafeSettings(ksafe: KSafe, scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())): KSafeSettings =
     KSafeSettingsImpl(ksafe, scope)
