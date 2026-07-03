@@ -5,7 +5,6 @@ import io.github.ashrafkhan19.ksafesettings.KSafeSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -87,14 +86,13 @@ class FakeKSafeSettings(private val scope: CoroutineScope) : KSafeSettings {
     @Suppress("UNCHECKED_CAST")
     override fun <T> flow(key: String, default: T): StateFlow<T> {
         val existing = flows[key]
-        return if (existing != null) {
-            existing as StateFlow<T>
-        } else {
-            val initial: T = rawGet(key, default)
-            val mutable = MutableStateFlow<Any?>(initial)
-            flows[key] = mutable
-            mutable.asStateFlow() as StateFlow<T>
-        }
+        if (existing != null) return existing as StateFlow<T>
+
+        val initial: T = rawGet(key, default)
+        val mutable = MutableStateFlow<Any?>(initial)
+        flows[key] = mutable
+        // Return the MutableStateFlow directly so repeated calls return the same instance.
+        return mutable as StateFlow<T>
     }
 
     // ── Utilities ─────────────────────────────────────────────────────────

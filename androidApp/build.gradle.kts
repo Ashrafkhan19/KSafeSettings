@@ -13,9 +13,14 @@ kotlin {
 }
 dependencies {
     implementation(projects.shared)
+    implementation(projects.ksafeSettingsCore)
+    implementation(projects.ksafeSettingsCompose)
+    implementation(libs.ksafe)
 
     implementation(libs.androidx.activity.compose)
-
+    implementation(libs.androidx.lifecycle.runtimeKtx)
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.compose.material3)
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
 }
