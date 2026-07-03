@@ -3,9 +3,10 @@ package io.github.ashrafkhan19.ksafesettings
 import eu.anifantakis.lib.ksafe.KSafe
 import eu.anifantakis.lib.ksafe.KSafeWriteMode
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -22,7 +23,7 @@ import kotlin.reflect.KProperty
  */
 internal class KSafeSettingsImpl(
     override val ksafe: KSafe,
-    private val scope: CoroutineScope,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
 ) : KSafeSettings {
 
     // ── Key registry (for contains / remove / clear tracking) ─────────────
@@ -159,7 +160,7 @@ internal class KSafeSettingsImpl(
         val initial = loadInitialValue(key, default)
         val mutable = MutableStateFlow<Any?>(initial)
         stateFlows[key] = mutable
-        return mutable.asStateFlow() as StateFlow<T>
+        return mutable as StateFlow<T>
     }
 
     // ── Utilities ─────────────────────────────────────────────────────────

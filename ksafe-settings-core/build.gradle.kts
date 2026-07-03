@@ -39,6 +39,15 @@ kotlin {
     }
 
     sourceSets {
+        val nonAndroidMain by creating {
+            dependsOn(commonMain.get())
+        }
+        getByName("iosArm64Main").dependsOn(nonAndroidMain)
+        getByName("iosSimulatorArm64Main").dependsOn(nonAndroidMain)
+        getByName("jvmMain").dependsOn(nonAndroidMain)
+        getByName("wasmJsMain").dependsOn(nonAndroidMain)
+        getByName("jsMain").dependsOn(nonAndroidMain)
+
         commonMain.dependencies {
             api(libs.ksafe)
             implementation(libs.kotlinx.coroutinesCore)

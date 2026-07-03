@@ -2,6 +2,8 @@ package io.github.ashrafkhan19.ksafesettings
 
 import eu.anifantakis.lib.ksafe.KSafe
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.properties.ReadWriteProperty
 
@@ -13,15 +15,23 @@ import kotlin.properties.ReadWriteProperty
  * unencrypted; secure settings are encrypted with AES-256-GCM backed by
  * the platform's hardware keystore where available.
  *
- * ### Usage
+ * ### Recommended usage — Compose (zero config)
  * ```kotlin
- * val ksafe = KSafe(context) // Android
- * val ksafe = KSafe()        // iOS / JVM / Web
- * val settings = KSafeSettings(ksafe, viewModelScope)
+ * // All platforms — wrap root composable once:
+ * KSafeSettingsProvider { App() }
  *
- * var isDarkMode by settings.bool("dark_mode", default = false)
- * var authToken  by settings.secureString("auth_token")
- * val theme: StateFlow<String> = settings.flow("theme", "system")
+ * // Access anywhere in the tree:
+ * val settings = LocalKSafeSettings.current
+ * var isDarkMode by settings.bool("dark_mode", false)
+ * ```
+ *
+ * ### Non-Compose usage
+ * ```kotlin
+ * // Android
+ * val settings = KSafeSettings(context)
+ *
+ * // iOS / JVM / Web
+ * val settings = KSafeSettings()
  * ```
  *
  * @see KSafeSettingsImpl for the concrete implementation.
@@ -144,20 +154,31 @@ interface KSafeSettings {
 }
 
 /**
- * Factory function that creates a [KSafeSettings] backed by [ksafe].
+ * Factory function that creates a [KSafeSettings] backed by the given [ksafe] instance.
  *
- * ### Android
+ * This is the **escape-hatch** constructor for advanced use-cases where you need
+ * to configure KSafe directly (custom encryption protection, biometric keys, etc.).
+ * For typical usage prefer the platform-specific factories:
+ *
+ * ### Android (via `ksafe-settings-core`, no KSafe import needed)
  * ```kotlin
- * val settings = KSafeSettings(KSafe(context), viewModelScope)
+ * val settings = KSafeSettings(context)        // or KSafeSettings(context, customScope)
  * ```
  *
- * ### iOS / JVM / Web
+ * ### iOS / JVM / Web (via `ksafe-settings-core`, no KSafe import needed)
  * ```kotlin
- * val settings = KSafeSettings(KSafe(), applicationScope)
+ * val settings = KSafeSettings()               // or KSafeSettings(customScope)
+ * ```
+ *
+ * ### Compose (via `ksafe-settings-compose`, zero wiring)
+ * ```kotlin
+ * KSafeSettingsProvider { App() }              // provides LocalKSafeSettings automatically
+ * val settings = LocalKSafeSettings.current    // access anywhere in the tree
  * ```
  *
  * @param ksafe  A configured [KSafe] instance (creates the storage backend).
- * @param scope  A [CoroutineScope] used to back [KSafeSettings.flow] StateFlows.
+ * @param scope  Optional [CoroutineScope] for backing [KSafeSettings.flow] StateFlows.
+ *               Defaults to an internal `IO` scope if not provided.
  */
-fun KSafeSettings(ksafe: KSafe, scope: CoroutineScope): KSafeSettings =
+fun KSafeSettings(ksafe: KSafe, scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())): KSafeSettings =
     KSafeSettingsImpl(ksafe, scope)

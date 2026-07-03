@@ -59,6 +59,9 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            // KSafeSettings — demo UI uses the library directly from shared
+            implementation(project(":ksafe-settings-core"))
+            implementation(project(":ksafe-settings-compose"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

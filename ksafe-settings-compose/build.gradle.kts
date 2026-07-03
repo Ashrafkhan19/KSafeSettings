@@ -41,10 +41,22 @@ kotlin {
     }
 
     sourceSets {
+        val nonAndroidMain by creating {
+            dependsOn(commonMain.get())
+        }
+        getByName("iosArm64Main").dependsOn(nonAndroidMain)
+        getByName("iosSimulatorArm64Main").dependsOn(nonAndroidMain)
+        getByName("jvmMain").dependsOn(nonAndroidMain)
+        getByName("wasmJsMain").dependsOn(nonAndroidMain)
+        getByName("jsMain").dependsOn(nonAndroidMain)
+
         commonMain.dependencies {
             api(projects.ksafeSettingsCore)
             api(libs.ksafe.compose)
             implementation(libs.compose.runtime)
+        }
+        androidMain.dependencies {
+            implementation(libs.compose.ui)  // LocalContext
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
